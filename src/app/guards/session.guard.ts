@@ -13,8 +13,6 @@ export class SessionGuard implements CanActivate {
   canActivate(): boolean {
     const { session } = this.sessionStore.getState();
 
-    console.log('SessionGuard', session);
-
     if (!session) {
       this.router.navigate(['/auth/login']);
       return false;
