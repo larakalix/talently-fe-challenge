@@ -1,5 +1,13 @@
-import type { AuthUser } from './../types/auth.type';
-import { signal } from '@angular/core';
+import type { AuthUser } from '../types/auth.type';
+import { Injectable } from '@angular/core';
+import { StateCreator, ZustandBaseService } from 'ngx-zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
+
+export type SessionState = {
+  session: AuthUser | null;
+  setSession: (session: AuthUser | null) => void;
+};
 
 const fakeState = {
   uid: 'grzOYyHqLNSAUm7ZVBfnQDqoia62',
@@ -9,4 +17,23 @@ const fakeState = {
     'eyJhbGciOiJSUzI1NiIsImtpZCI6IjMwYjIyMWFiNjU2MTdiY2Y4N2VlMGY4NDYyZjc0ZTM2NTIyY2EyZTQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdGwtdGFzay1kYiIsImF1ZCI6InRsLXRhc2stZGIiLCJhdXRoX3RpbWUiOjE3NDMwMjU3OTYsInVzZXJfaWQiOiJncnpPWXlIcUxOU0FVbTdaVkJmblFEcW9pYTYyIiwic3ViIjoiZ3J6T1l5SHFMTlNBVW03WlZCZm5RRHFvaWE2MiIsImlhdCI6MTc0MzAyNTc5NiwiZXhwIjoxNzQzMDI5Mzk2LCJlbWFpbCI6InpsYXRhbkB5b3BtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJ6bGF0YW5AeW9wbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.i2IeE3pFRysnMdyNmoznbdcXXjhnIeAoGcJ5e1ydb4PRQV9LPc5fluU085riCjfV0csKEJrx0uk_0H6P_29ZCrPZoKvJB8darix1z1iz-Dn5phEKBz-zb39NN2jR5cjU1FLPjbpKl0UseGxQ7mrq13E2Ek0IMv866ms7raEZriw0kGujA2AMedps6rlopwaTsKTNNv-momm8rMTTWmqMtbiQvLtqUhgzBJ5jsA4ZQfTaix6Y5GoZN7xKH6Dth8-K5NrNlnnn3xs1f_i8OOLWXtALA5cclvABdZ8GOPMMN_takXdQTF2q0fDdrXUkI-bPDFq42HL9w-mf6rDh-onyfg',
 } as AuthUser | null;
 
-export const sessionSignal = signal<AuthUser | null>(null);
+@Injectable({
+  providedIn: 'root',
+})
+export class SessionStateService extends ZustandBaseService<SessionState> {
+  initStore(): StateCreator<SessionState> {
+    return (set) => ({
+      session: fakeState,
+      setSession: (session: AuthUser | null) => set({ session }),
+    });
+  }
+
+  override createStore() {
+    return createStore(
+      persist<SessionState>(this.initStore(), {
+        name: 'session-storage',
+        storage: createJSONStorage(() => sessionStorage),
+      })
+    );
+  }
+}

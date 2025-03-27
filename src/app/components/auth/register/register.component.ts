@@ -25,7 +25,16 @@ export class RegisterComponent extends AuthFormBase {
   onSubmit(): void {
     if (this.form.valid) {
       const credentials = this.form.value satisfies AuthCredentials;
-      console.log('credentials ->', credentials);
+
+      this.authService.register(credentials).subscribe({
+        next: (response) => {
+          // Redirect or update UI as needed
+          console.log('Registered user:', response);
+        },
+        error: (error) => {
+          console.error('Error registering:', error);
+        },
+      });
     }
   }
 }

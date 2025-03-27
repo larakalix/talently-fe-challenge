@@ -1,24 +1,43 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environment';
-import { sessionSignal } from '../../state/session.signal';
 import { Task } from '../../types/task.type';
-import { tasksSignal } from '../../state/tasks.signal';
+import { SessionStateService } from '../../state/session-store';
+import { ApiResponse } from '../../types/api.type';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
+  private sessionService = inject(SessionStateService);
+
+  private defaultHeaders = new HttpHeaders({
+    'Content-Type': 'application/json',
+  });
+
   constructor(private http: HttpClient) {}
 
-  fetchTasks() {
-    const token = sessionSignal()?.token;
-    if (!token) return;
+  getTasks(): Observable<ApiResponse<Task[]>> {
+    const { session } = this.sessionService.getState();
+    if (!session) return throwError(() => 'No session found');
 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.defaultHeaders.append(
+      'Authorization',
+      `Bearer ${session.token}`
+    );
 
-    this.http
-      .get<Task[]>(`${environment.API_URL}tasks`, { headers })
-      .subscribe((tasks) => tasksSignal.set(tasks));
+    return this.http
+      .get<ApiResponse<Task[]>>(`${environment.API_URL}tasks`, { headers })
+      .pipe(
+        tap((response) => {
+          return response;
+        }),
+        catchError((error) => {
+          console.error('Fetch tasks error:', error);
+          return throwError(() => error);
+        })
+      );
   }
 }

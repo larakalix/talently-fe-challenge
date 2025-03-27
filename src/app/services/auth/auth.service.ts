@@ -1,9 +1,9 @@
 import type { AuthUser, AuthCredentials } from '../../types/auth.type';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environment';
-import { sessionSignal } from '../../state/session.signal';
-import { tasksSignal } from '../../state/tasks.signal';
 import { ApiResponse } from '../../types/api.type';
 
 @Injectable({
@@ -16,44 +16,45 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(credentials: AuthCredentials) {
+  login(credentials: AuthCredentials): Observable<ApiResponse<AuthUser>> {
     return this.http
       .post<ApiResponse<AuthUser>>(
         `${environment.API_URL}auth/login`,
         credentials,
-        { headers: this.defaultHeaders }
+        {
+          headers: this.defaultHeaders,
+        }
       )
-      .subscribe({
-        next: (response) => {
-          console.log('login ->', response);
-          sessionSignal.set(response.data);
-        },
-        error: (error) => {
-          console.error('Login ERROR ->', error);
-        },
-      });
+      .pipe(
+        tap((response) => {
+          return response;
+        }),
+        catchError((error) => {
+          console.error('Login error:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
-  register(user: AuthCredentials) {
+  register(
+    user: AuthCredentials
+  ): Observable<ApiResponse<Omit<AuthUser, 'token'>>> {
     return this.http
       .post<ApiResponse<Omit<AuthUser, 'token'>>>(
         `${environment.API_URL}auth/register`,
         user,
-        { headers: this.defaultHeaders }
+        {
+          headers: this.defaultHeaders,
+        }
       )
-      .subscribe({
-        next: (response) => {
-          console.log('register ->', response);
-          sessionSignal.set(response.data);
-        },
-        error: (error) => {
-          console.error('Register ERROR ->', error);
-        },
-      });
-  }
-
-  logout() {
-    sessionSignal.set(null);
-    tasksSignal.set([]);
+      .pipe(
+        tap((response) => {
+          return response;
+        }),
+        catchError((error) => {
+          console.error('Register error:', error);
+          return throwError(() => error);
+        })
+      );
   }
 }
