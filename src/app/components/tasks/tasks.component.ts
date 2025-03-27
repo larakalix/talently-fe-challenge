@@ -37,6 +37,7 @@ export class TasksComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingState = 'loading';
+
     this.taskService
       .getTasks()
       .pipe(

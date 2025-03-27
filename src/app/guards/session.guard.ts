@@ -1,5 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { filter, first, map } from 'rxjs/operators';
 import { SessionStateService } from '../state/session-store';
 
 @Injectable({
@@ -10,14 +12,19 @@ export class SessionGuard implements CanActivate {
 
   constructor(private router: Router) {}
 
-  canActivate(): boolean {
-    const { session } = this.sessionStore.getState();
-
-    if (!session) {
-      this.router.navigate(['/auth/login']);
-      return false;
-    }
-
-    return true;
+  canActivate(): Observable<boolean> {
+    return this.sessionStore
+      .useStore((state) => state.session)
+      .pipe(
+        filter((session) => session !== undefined),
+        first(),
+        map((session) => {
+          if (session) {
+            return true;
+          }
+          this.router.navigate(['/auth/login']);
+          return false;
+        })
+      );
   }
 }

@@ -1,5 +1,13 @@
-<main class="w-full max-w-7xl m-auto p-4 flex justify-center items-center min-h-[calc(100vh)]">
-  <mat-card appearance="outlined" class="max-w-md mx-auto w-full p-6 bg-white">
-    <router-outlet></router-outlet>
-  </mat-card>
-</main>
+<ng-container *ngIf="session$ | async as session; else ready"> </ng-container>
+<ng-template #ready>
+  <main
+    class="w-full max-w-7xl m-auto p-4 flex justify-center items-center min-h-[calc(100vh)]"
+  >
+    <mat-card
+      appearance="outlined"
+      class="max-w-md mx-auto w-full p-6 bg-white"
+    >
+      <router-outlet></router-outlet>
+    </mat-card>
+  </main>
+</ng-template>
