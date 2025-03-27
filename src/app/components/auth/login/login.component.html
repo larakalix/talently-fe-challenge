@@ -1,1 +1,68 @@
-<p>login works!</p>
+<h2 class="text-2xl font-semibold text-center mb-6">Sign In</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="fill" style="display: block; margin-bottom: 1rem">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" type="email" required />
+    <mat-error
+      class="!flex items-center gap-x-1 mt-2 !p-0"
+      *ngIf="isFieldTouched('email') && hasFieldError('email', 'required')"
+    >
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Example home icon"
+        fontIcon="error_outline"
+      ></mat-icon>
+      Email is required
+    </mat-error>
+    <mat-error
+      class="!flex items-center gap-x-1 mt-2 !p-0"
+      *ngIf="isFieldTouched('email') && hasFieldError('email', 'email')"
+    >
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Example home icon"
+        fontIcon="error_outline"
+      ></mat-icon>
+      Invalid email
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" style="display: block; margin-bottom: 1rem">
+    <mat-label>Password</mat-label>
+    <input matInput formControlName="password" type="password" required />
+    <mat-error
+      class="!flex items-center gap-x-1 mt-2 !p-0"
+      *ngIf="
+        isFieldTouched('password') && hasFieldError('password', 'required')
+      "
+    >
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Example home icon"
+        fontIcon="error_outline"
+      ></mat-icon>
+      Password is required
+    </mat-error>
+  </mat-form-field>
+
+  <div class="w-full flex justify-center">
+    <button
+      mat-flat-button
+      color="primary"
+      class="mx-auto"
+      [disabled]="form.invalid"
+    >
+      Sign In
+    </button>
+  </div>
+</form>
+
+<footer class="mt-8">
+  <p class="text-center mt-4 text-sm">
+    Don't have an account?
+    <a routerLink="/auth/register" class="text-blue-500 hover:underline"
+      >Sign Up</a
+    >
+  </p>
+</footer>

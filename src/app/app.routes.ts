@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
+import { SessionGuard } from './guards/session.guard';
+import { PublicGuard } from './guards/public.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/tasks', pathMatch: 'full' },
   {
     path: 'tasks',
+    canActivate: [SessionGuard],
     loadComponent: () =>
       import('./components/tasks/tasks.component').then(
         (m) => m.TasksComponent
@@ -11,6 +14,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
+    canActivate: [PublicGuard],
     loadComponent: () =>
       import('./components/auth/auth-layout.component').then(
         (m) => m.AuthLayoutComponent

@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { AppStateService } from '../services/app-state/app-state.service';
+import { sessionSignal } from '../state/session.signal';
 
 @Injectable({
   providedIn: 'root',
 })
-export class NoAuthGuard implements CanActivate {
-  constructor(private state: AppStateService, private router: Router) {}
+export class SessionGuard implements CanActivate {
+  constructor(private router: Router) {}
 
   canActivate(): boolean {
-    if (!this.state.session()) {
+    if (!sessionSignal()) {
       this.router.navigate(['/auth/login']);
       return false;
     }
