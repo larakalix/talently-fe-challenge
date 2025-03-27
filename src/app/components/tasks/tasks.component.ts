@@ -28,6 +28,7 @@ export class TasksComponent implements OnInit {
   private sessionStore = inject(SessionStateService);
   private taskStore = inject(TaskStateService);
 
+  session$ = this.sessionStore.useStore((state) => state.session);
   tasks$ = this.taskStore.useStore((state) => state.tasks);
 
   loadingState: LoadingState = 'idle';
@@ -50,10 +51,6 @@ export class TasksComponent implements OnInit {
         },
         error: (err) => console.error('Error fetching tasks:', err),
       });
-  }
-
-  isLoading(): boolean {
-    return this.loadingState === 'loading';
   }
 
   editTask(task: Task): void {}
