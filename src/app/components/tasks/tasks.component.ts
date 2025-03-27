@@ -6,11 +6,13 @@ import { Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TaskService } from '../../services/tasks/task.service';
 import { SessionStateService } from '../../state/session-store';
 import { TaskStateService } from '../../state/tasks-store';
 import { finalize } from 'rxjs';
+import { TaskDialogComponent } from './task-dialog/task-dialog.component';
 
 @Component({
   selector: 'app-tasks',
@@ -25,6 +27,8 @@ import { finalize } from 'rxjs';
   styleUrl: './tasks.component.scss',
 })
 export class TasksComponent implements OnInit {
+  readonly dialog = inject(MatDialog);
+
   private sessionStore = inject(SessionStateService);
   private taskStore = inject(TaskStateService);
 
@@ -54,7 +58,15 @@ export class TasksComponent implements OnInit {
       });
   }
 
-  editTask(task: Task): void {}
+  openDialog() {}
+
+  addTask(task?: Task): void {
+    this.dialog.open(TaskDialogComponent, { data: { task } });
+  }
+
+  editTask(task: Task): void {
+    this.dialog.open(TaskDialogComponent, { data: { task } });
+  }
 
   deleteTask(task: Task): void {}
 

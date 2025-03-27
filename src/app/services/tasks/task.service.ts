@@ -19,14 +19,18 @@ export class TaskService {
 
   constructor(private http: HttpClient) {}
 
-  getTasks(): Observable<ApiResponse<Task[]>> {
+  getHeaders(): HttpHeaders {
     const { session } = this.sessionService.getState();
-    if (!session) return throwError(() => 'No session found');
+    if (!session) return this.defaultHeaders;
 
-    const headers = this.defaultHeaders.append(
+    return this.defaultHeaders.append(
       'Authorization',
       `Bearer ${session.token}`
     );
+  }
+
+  getTasks(): Observable<ApiResponse<Task[]>> {
+    const headers = this.getHeaders();
 
     return this.http
       .get<ApiResponse<Task[]>>(`${environment.API_URL}tasks`, { headers })
@@ -36,6 +40,60 @@ export class TaskService {
         }),
         catchError((error) => {
           console.error('Fetch tasks error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  createTask(task: Task): Observable<ApiResponse<Task>> {
+    const headers = this.getHeaders();
+
+    return this.http
+      .post<ApiResponse<Task>>(`${environment.API_URL}tasks`, task, {
+        headers,
+      })
+      .pipe(
+        tap((response) => {
+          return response;
+        }),
+        catchError((error) => {
+          console.error('Create task error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  updateTask(task: Task): Observable<ApiResponse<Task>> {
+    const headers = this.getHeaders();
+
+    return this.http
+      .post<ApiResponse<Task>>(`${environment.API_URL}tasks`, task, {
+        headers,
+      })
+      .pipe(
+        tap((response) => {
+          return response;
+        }),
+        catchError((error) => {
+          console.error('Create task error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  deleteTask(id: Task['id']): Observable<ApiResponse<Task>> {
+    const headers = this.getHeaders();
+
+    return this.http
+      .delete<ApiResponse<Task>>(`${environment.API_URL}tasks/${id}`, {
+        headers,
+      })
+      .pipe(
+        tap((response) => {
+          return response;
+        }),
+        catchError((error) => {
+          console.error('Delete task error:', error);
           return throwError(() => error);
         })
       );

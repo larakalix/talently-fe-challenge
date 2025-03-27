@@ -1,20 +1,38 @@
-<mat-toolbar class="w-full">
-  <div class="w-full max-w-7xl m-auto flex justify-between items-center">
-    <span>My Application</span>
-
-    <button mat-stroked-button color="#FF4858" (click)="logout()">
-      Logout
-    </button>
-  </div>
-</mat-toolbar>
-
 <ng-container *ngIf="session$ | async as session; else loading">
+  <mat-toolbar class="w-full">
+    <div class="w-full max-w-7xl m-auto flex justify-between items-center">
+      <h1 class="text-xl text-gray-800 font-bold">Tasks Manager</h1>
+
+      <ul class="flex items-center gap-4">
+        <li>
+          <span class="text-gray-800 text-base"> Welcome, {{ session.email }}! </span>
+        </li>
+        <li>
+          <button mat-flat-button color="warn" (click)="logout()">
+            Logout
+          </button>
+        </li>
+      </ul>
+    </div>
+  </mat-toolbar>
+
   <section class="w-full max-w-7xl m-auto p-4">
+    <ng-container *ngIf="(tasks$ | async)?.length === 0">
+      <div
+        class="flex flex-col justify-between items-center gap-4 py-12 px-8 border border-gray-300 bg-gray-200/40 rounded-lg"
+      >
+        <p class="text-gray-600">No tasks available, add one now!</p>
+        <button mat-flat-button color="primary" (click)="addTask()">
+          Add Task
+        </button>
+      </div>
+    </ng-container>
+
     <div
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
       *ngFor="let task of tasks$ | async"
     >
-      <mat-card class="mb-4">
+      <mat-card>
         <mat-card-header>
           <mat-card-title>{{ task.title }}</mat-card-title>
         </mat-card-header>
