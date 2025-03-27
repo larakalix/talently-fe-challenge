@@ -1,15 +1,37 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+  { path: '', redirectTo: '/tasks', pathMatch: 'full' },
   {
-    path: '',
-    loadChildren: () =>
-      import('./components/tasks/tasks.module').then((m) => m.TasksModule),
+    path: 'tasks',
+    loadComponent: () =>
+      import('./components/tasks/tasks.component').then(
+        (m) => m.TasksComponent
+      ),
   },
   {
-    path: '',
-    loadChildren: () =>
-      import('./components/auth/auth.module').then((m) => m.AuthModule),
+    path: 'auth',
+    loadComponent: () =>
+      import('./components/auth/auth-layout.component').then(
+        (m) => m.AuthLayoutComponent
+      ),
+    children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./components/auth/login/login.component').then(
+            (m) => m.LoginComponent
+          ),
+      },
+      {
+        path: 'register',
+        loadComponent: () =>
+          import('./components/auth/register/register.component').then(
+            (m) => m.RegisterComponent
+          ),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];
