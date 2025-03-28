@@ -26,10 +26,14 @@ export class TaskStateService extends ZustandBaseService<TaskState> {
         set((state) => ({
           tasks: state.tasks.filter((task) => task.id !== id),
         })),
-      updateTask: (task: Task) =>
-        set((state) => ({
-          tasks: state.tasks.map((t) => (t.id === task.id ? task : t)),
-        })),
+      updateTask: (task: Task) => {
+        const { tasks } = get();
+        const taskIndex = tasks.findIndex((t) => t.id === task.id);
+        if (taskIndex === -1) return;
+
+        tasks[taskIndex] = task;
+        set({ tasks });
+      },
       clearTasks: () => set({ tasks: [] }),
       setTasks: (tasks: Task[]) => set({ tasks }),
     });
