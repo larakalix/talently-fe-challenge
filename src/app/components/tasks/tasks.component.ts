@@ -12,6 +12,7 @@ import { SessionStateService } from '../../state/session-store';
 import { TaskStateService } from '../../state/tasks-store';
 import { TaskDialogComponent } from './task-dialog/task-dialog.component';
 import { HeaderComponent } from './header/header.component';
+import { ConfirmDialogComponent } from '../../ui/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-tasks',
@@ -76,6 +77,23 @@ export class TasksComponent implements OnInit {
       error: (error) => {
         console.error('Error deleting task:', error);
       },
+    });
+  }
+
+  confirmDelete(task: Task): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: {
+        title: 'Confirm Deletion',
+        message: `Are you sure you want to delete the task "${task.title}"?`,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('The dialog was closed', result);
+      if (result === true) {
+        this.deleteTask(task.id!);
+      }
     });
   }
 }

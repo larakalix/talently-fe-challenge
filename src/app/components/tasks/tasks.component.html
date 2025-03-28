@@ -60,7 +60,7 @@
           <button
             mat-button
             color="warn"
-            (click)="deleteTask(task.id)"
+            (click)="confirmDelete(task)"
             [disabled]="task.status === 'done'"
           >
             Delete

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { environment } from '../../../environment';
+import { environment } from '../../../../environment';
 import { Task } from '../../types/task.type';
 import { SessionStateService } from '../../state/session-store';
 import { ApiResponse } from '../../types/api.type';
@@ -31,6 +31,8 @@ export class TaskService {
 
   getTasks(): Observable<ApiResponse<Task[]>> {
     const headers = this.getHeaders();
+
+    console.log("GET/ tasks ->", headers);
 
     return this.http
       .get<ApiResponse<Task[]>>(`${environment.API_URL}tasks`, { headers })
