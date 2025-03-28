@@ -1,4 +1,6 @@
-<ng-container *ngIf="session$ | async as session; else ready"> </ng-container>
+<ng-container *ngIf="session$ | async as session; else ready">
+  <h1>Loading...</h1>
+</ng-container>
 <ng-template #ready>
   <main
     class="w-full max-w-7xl m-auto p-4 flex justify-center items-center min-h-[calc(100vh)]"
