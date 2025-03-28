@@ -2,26 +2,25 @@ import type { LoadingState } from '../../types/common-state.type';
 import type { Task } from '../../types/task.type';
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { finalize } from 'rxjs';
 import { TaskService } from '../../services/tasks/task.service';
 import { SessionStateService } from '../../state/session-store';
 import { TaskStateService } from '../../state/tasks-store';
-import { finalize } from 'rxjs';
 import { TaskDialogComponent } from './task-dialog/task-dialog.component';
+import { HeaderComponent } from './header/header.component';
 
 @Component({
   selector: 'app-tasks',
   imports: [
     CommonModule,
     MatCardModule,
-    MatToolbarModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    HeaderComponent,
   ],
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.scss',
@@ -37,7 +36,7 @@ export class TasksComponent implements OnInit {
 
   loadingState: LoadingState = 'idle';
 
-  constructor(private router: Router, private taskService: TaskService) {}
+  constructor(private taskService: TaskService) {}
 
   ngOnInit(): void {
     this.loadingState = 'loading';
@@ -68,12 +67,15 @@ export class TasksComponent implements OnInit {
     this.dialog.open(TaskDialogComponent, { data: { task } });
   }
 
-  deleteTask(task: Task): void {}
-
-  logout(): void {
-    const { setSession } = this.sessionStore.getState();
-
-    setSession(null);
-    this.router.navigate(['/auth/login']);
+  deleteTask(id: Task['id']): void {
+    this.taskService.deleteTask(id).subscribe({
+      next: (response) => {
+        const { removeTask } = this.taskStore.getState();
+        removeTask(id);
+      },
+      error: (error) => {
+        console.error('Error deleting task:', error);
+      },
+    });
   }
 }

@@ -18,7 +18,7 @@
       ></textarea>
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="w-full">
+    <mat-form-field *ngIf="data.task" appearance="fill" class="w-full">
       <mat-label>Status</mat-label>
       <mat-select formControlName="status">
         <mat-option *ngFor="let status of statuses" [value]="status.value">
@@ -30,9 +30,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="flex justify-between">
-  <div class="flex gap-4">
-    <button *ngIf="data.task" mat-button (click)="deleteTask(data.task.id)">Delete</button>
-  </div>
   <div class="flex gap-4">
     <button mat-button (click)="closeDialog()">Cancel</button>
     <button mat-button color="primary" (click)="submit()">Save</button>

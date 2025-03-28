@@ -83,28 +83,15 @@ export class TaskDialogComponent {
         this.updateTask(newTask);
       }
 
-      // this.dialogRef.close(this.form.value);
+      this.form.reset();
+      this.dialogRef.close(this.form.value);
     }
-  }
-
-  deleteTask(id: Task['id']): void {
-    this.taskService.deleteTask(id).subscribe({
-      next: (response) => {
-        const { removeTask } = this.taskStore.getState();
-        console.log('Deleted task:', response);
-        removeTask(id);
-      },
-      error: (error) => {
-        console.error('Error deleting task:', error);
-      },
-    });
   }
 
   private createTask(task: Task): void {
     this.taskService.createTask(task).subscribe({
       next: (response) => {
         const { addTask } = this.taskStore.getState();
-        console.log('Created task:', response);
         addTask(response.data);
       },
       error: (error) => {
@@ -117,7 +104,6 @@ export class TaskDialogComponent {
     this.taskService.updateTask(task).subscribe({
       next: (response) => {
         const { updateTask } = this.taskStore.getState();
-        console.log('Updated task:', response);
         updateTask(task);
       },
       error: (error) => {

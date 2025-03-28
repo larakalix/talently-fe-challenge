@@ -67,7 +67,7 @@ export class TaskService {
     const headers = this.getHeaders();
 
     return this.http
-      .post<ApiResponse<Task>>(`${environment.API_URL}tasks`, task, {
+      .put<ApiResponse<Task>>(`${environment.API_URL}tasks`, task, {
         headers,
       })
       .pipe(
@@ -75,7 +75,7 @@ export class TaskService {
           return response;
         }),
         catchError((error) => {
-          console.error('Create task error:', error);
+          console.error('Update task error:', error);
           return throwError(() => error);
         })
       );
