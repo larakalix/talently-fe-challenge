@@ -32,8 +32,6 @@ export class TaskService {
   getTasks(): Observable<ApiResponse<Task[]>> {
     const headers = this.getHeaders();
 
-    console.log("GET/ tasks ->", headers);
-
     return this.http
       .get<ApiResponse<Task[]>>(`${environment.API_URL}tasks`, { headers })
       .pipe(
