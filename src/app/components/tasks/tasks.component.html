@@ -23,23 +23,46 @@
     </ng-template>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <mat-card *ngFor="let task of tasks$ | async">
+      <mat-card *ngFor="let task of tasks$ | async" class="flex flex-col">
         <mat-card-header>
           <mat-card-title>{{ task.title }}</mat-card-title>
         </mat-card-header>
 
-        <mat-card-content>
+        <mat-card-content class="flex-1">
           <p class="font-normal text-zinc-700 text-sm py-4">
             {{ task.description }}
           </p>
-          <p>Status: {{ task.status }}</p>
+
+          <div class="flex items-center">
+            <span
+              class="w-3 h-3 rounded-full mr-2"
+              [ngClass]="{
+                'bg-blue-500': task.status === 'todo',
+                'bg-yellow-500': task.status === 'in-progress',
+                'bg-green-500': task.status === 'done'
+              }"
+            ></span>
+            <span>
+              <ng-container [ngSwitch]="task.status">
+                <span *ngSwitchCase="'todo'">To do</span>
+                <span *ngSwitchCase="'in-progress'">In Progress</span>
+                <span *ngSwitchCase="'done'">Done</span>
+                <span *ngSwitchDefault>{{ task.status }}</span>
+              </ng-container>
+            </span>
+          </div>
         </mat-card-content>
 
-        <mat-card-actions>
+        <mat-card-actions class="w-full flex items-center justify-between">
           <button mat-button color="primary" (click)="editTask(task)">
             Edit
           </button>
-          <button mat-button color="warn" (click)="deleteTask(task.id)">
+          <button
+            mat-button
+            color="warn"
+            (click)="deleteTask(task.id)"
+            [disabled]="task.status === 'done'"
+          >
             Delete
           </button>
         </mat-card-actions>

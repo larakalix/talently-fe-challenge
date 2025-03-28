@@ -1,9 +1,9 @@
 <ng-container *ngIf="session$ | async as session">
-  <mat-toolbar class="w-full">
-    <div class="w-full max-w-7xl m-auto flex justify-between items-center">
+  <mat-toolbar class="w-full !h-auto">
+    <div class="w-full max-w-7xl m-auto flex flex-col md:flex-row justify-between items-center py-4 md:py-2">
       <h1 class="text-xl text-gray-800 font-bold">Tasks Manager</h1>
 
-      <ul class="flex items-center gap-4">
+      <ul class="flex flex-col md:flex-row items-center gap-4">
         <li>
           <span class="text-gray-800 text-base">
             Welcome, {{ session.email }}!

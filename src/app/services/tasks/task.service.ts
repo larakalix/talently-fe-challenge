@@ -66,8 +66,12 @@ export class TaskService {
   updateTask(task: Task): Observable<ApiResponse<Task>> {
     const headers = this.getHeaders();
 
+    if (!task.id) {
+      return throwError(() => new Error('Task ID is required'));
+    }
+
     return this.http
-      .put<ApiResponse<Task>>(`${environment.API_URL}tasks`, task, {
+      .put<ApiResponse<Task>>(`${environment.API_URL}tasks/${task.id}`, task, {
         headers,
       })
       .pipe(
