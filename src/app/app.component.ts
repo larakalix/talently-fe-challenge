@@ -7,7 +7,11 @@ import { SpinnerComponent } from './ui/spinner/spinner.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SpinnerComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    SpinnerComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

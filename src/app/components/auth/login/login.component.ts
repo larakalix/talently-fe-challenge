@@ -1,7 +1,8 @@
-import type { AuthCredentials, AuthUser } from '../../../types/auth.type';
+import type { AuthCredentials } from '../../../types/auth.type';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { AuthFormBase } from '../common/auth-form.base';
 import { SharedFormModule } from '../common/shared-form.module';
 import { AuthService } from '../../../services/auth/auth.service';
@@ -20,6 +21,7 @@ export class LoginComponent extends AuthFormBase {
 
   constructor(
     private router: Router,
+    private toastr: ToastrService,
     private fb: FormBuilder,
     authService: AuthService
   ) {
@@ -31,22 +33,22 @@ export class LoginComponent extends AuthFormBase {
     });
   }
 
-  setState(session: AuthUser): void {
-    const { setSession } = this.sessionStore.getState();
-    setSession(session);
-  }
-
   async onSubmit(): Promise<void> {
     if (this.form.valid) {
       const credentials = this.form.value satisfies AuthCredentials;
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          this.setState(response.data);
+          this.sessionStore.getState().setSession(response.data);
+
+          this.toastr.success('Login successful', 'Success');
+
+          this.form.reset();
           this.router.navigate(['/tasks']);
         },
         error: (error) => {
           console.error('Error logging in:', error);
+          this.toastr.error("Email or password doesn't match", 'Error');
         },
       });
     }

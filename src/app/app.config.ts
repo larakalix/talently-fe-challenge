@@ -12,11 +12,19 @@ import {
   withEventReplay,
 } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideToastr } from 'ngx-toastr';
 import { SessionStateService } from './state/session-store';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
+    provideToastr({
+      preventDuplicates: true,
+      timeOut: 4000,
+      progressBar: true,
+      closeButton: true,
+      positionClass: 'toast-bottom-right',
+    }),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
