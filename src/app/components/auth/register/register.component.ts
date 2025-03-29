@@ -1,5 +1,6 @@
 import type { AuthCredentials } from '../../../types/auth.type';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthFormBase } from '../common/auth-form.base';
 import { SharedFormModule } from '../common/shared-form.module';
@@ -13,7 +14,11 @@ import { AuthService } from '../../../services/auth/auth.service';
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent extends AuthFormBase {
-  constructor(private fb: FormBuilder, authService: AuthService) {
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    authService: AuthService
+  ) {
     super(authService);
 
     this.form = this.fb.group({
@@ -28,8 +33,8 @@ export class RegisterComponent extends AuthFormBase {
 
       this.authService.register(credentials).subscribe({
         next: (response) => {
-          // Redirect or update UI as needed
-          console.log('Registered user:', response);
+          this.form.reset();
+          this.router.navigate(['/auth/login']);
         },
         error: (error) => {
           console.error('Error registering:', error);
