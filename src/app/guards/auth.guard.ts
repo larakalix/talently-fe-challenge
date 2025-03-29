@@ -5,8 +5,6 @@ import {
   RouterStateSnapshot,
   Router,
 } from '@angular/router';
-import { Observable } from 'rxjs';
-import { filter, first, map } from 'rxjs/operators';
 import { SessionStateService } from '../state/session-store';
 
 @Injectable({
@@ -20,28 +18,20 @@ export class AuthGuard implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean> {
-    const requiresAuth: boolean = route.data['requiresAuth'];
+  ): boolean {
+    const requiresAuth: boolean = route.data['requiresAuth'] ?? false;
+    const { session } = this.sessionStore.session();
 
-    return this.sessionStore
-      .useStore((state) => state.session)
-      .pipe(
-        filter((session) => session !== undefined),
-        first(),
-        map((session) => {
-          if (requiresAuth && !session) {
-            this.router.navigate(['/auth/login']);
-            return false;
-          }
+    if (requiresAuth && !session) {
+      this.router.navigate(['/auth/login']);
+      return false;
+    }
 
-          if (!requiresAuth && session) {
-            this.router.navigate(['/tasks']);
-            return false;
-          }
+    if (!requiresAuth && session) {
+      this.router.navigate(['/tasks']);
+      return false;
+    }
 
-          return true;
-
-        })
-      );
+    return true;
   }
 }

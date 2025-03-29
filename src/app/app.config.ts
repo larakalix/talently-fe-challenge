@@ -23,7 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideAppInitializer(async () => {
       const authService = inject(SessionStateService);
-      return () => authService.getState();
+      return () => authService.session().session;
     }),
   ],
 };

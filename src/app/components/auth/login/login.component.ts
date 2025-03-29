@@ -1,5 +1,5 @@
 import type { AuthCredentials, AuthUser } from '../../../types/auth.type';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthFormBase } from '../common/auth-form.base';
@@ -16,12 +16,11 @@ import { SessionStateService } from '../../../state/session-store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent extends AuthFormBase {
-  private sessionStore = inject(SessionStateService);
-
   constructor(
+    authService: AuthService,
     private router: Router,
     private fb: FormBuilder,
-    authService: AuthService
+    private sessionState: SessionStateService
   ) {
     super(authService);
 
@@ -31,18 +30,13 @@ export class LoginComponent extends AuthFormBase {
     });
   }
 
-  setState(session: AuthUser): void {
-    const { setSession } = this.sessionStore.getState();
-    setSession(session);
-  }
-
   async onSubmit(): Promise<void> {
     if (this.form.valid) {
       const credentials = this.form.value satisfies AuthCredentials;
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          this.setState(response.data);
+          this.sessionState.setSession(response.data as AuthUser);
           this.router.navigate(['/tasks']);
         },
         error: (error) => {

@@ -1,50 +1,77 @@
 import type { Task } from '../types/task.type';
-import { Injectable } from '@angular/core';
-import { StateCreator, ZustandBaseService } from 'ngx-zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { createStore } from 'zustand/vanilla';
+import { Injectable, signal, computed, effect } from '@angular/core';
+import { isBrowser } from '../utils/utils.methods';
 
 export type TaskState = {
   tasks: Task[];
-  addTask: (task: Task) => void;
-  removeTask: (id: string) => void;
-  updateTask: (task: Task) => void;
-  clearTasks: () => void;
-  setTasks: (tasks: Task[]) => void;
 };
+
+export const SESSION_STORAGE_KEY = 'task-store';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TaskStateService extends ZustandBaseService<TaskState> {
-  initStore(): StateCreator<TaskState> {
-    return (set, get) => ({
-      tasks: [],
-      addTask: (task: Task) =>
-        set((state) => ({ tasks: [...state.tasks, task] })),
-      removeTask: (id: string) =>
-        set((state) => ({
-          tasks: state.tasks.filter((task) => task.id !== id),
-        })),
-      updateTask: (task: Task) => {
-        const { tasks } = get();
-        const taskIndex = tasks.findIndex((t) => t.id === task.id);
-        if (taskIndex === -1) return;
+export class TaskStateService {
+  private readonly _tasks = signal<TaskState>(this.loadTasks());
 
-        tasks[taskIndex] = task;
-        set({ tasks });
-      },
-      clearTasks: () => set({ tasks: [] }),
-      setTasks: (tasks: Task[]) => set({ tasks }),
+  readonly tasks = computed(() => this._tasks());
+
+  constructor() {
+    effect(() => {
+      if (!isBrowser()) return;
+
+      const current = this._tasks();
+      if (current) {
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(current));
+      } else {
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+      }
     });
   }
 
-  override createStore() {
-    return createStore(
-      persist<TaskState>(this.initStore(), {
-        name: 'task-storage',
-        storage: createJSONStorage(() => sessionStorage),
-      })
-    );
+  setTasks(tasks: Task[]): void {
+    this._tasks.set({
+      tasks,
+    });
+  }
+
+  clearTasks(): void {
+    this._tasks.set({
+      tasks: [],
+    } as TaskState);
+  }
+
+  addTask(task: Task): void {
+    this._tasks.update((prev) => ({
+      tasks: [...prev.tasks, task],
+    }));
+  }
+
+  updateTask(updatedTask: Task): void {
+    this._tasks.update((prev) => ({
+      tasks: prev.tasks.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task
+      ),
+    }));
+  }
+
+  removeTask(id: string): void {
+    this._tasks.update((prev) => ({
+      tasks: prev.tasks.filter((task) => task.id !== id),
+    }));
+  }
+
+  private loadTasks(): TaskState {
+    try {
+      const stored = localStorage.getItem(SESSION_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored) as TaskState;
+      }
+      return { tasks: [] };
+    } catch {
+      return {
+        tasks: [],
+      };
+    }
   }
 }

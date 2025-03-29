@@ -1,31 +1,55 @@
 import type { AuthUser } from '../types/auth.type';
-import { Injectable } from '@angular/core';
-import { StateCreator, ZustandBaseService } from 'ngx-zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { createStore } from 'zustand/vanilla';
+import { Injectable, signal, computed, effect } from '@angular/core';
+import { isBrowser } from '../utils/utils.methods';
 
 export type SessionState = {
   session: AuthUser | null;
-  setSession: (session: AuthUser | null) => void;
 };
+
+export const SESSION_STORAGE_KEY = 'session-store';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SessionStateService extends ZustandBaseService<SessionState> {
-  initStore(): StateCreator<SessionState> {
-    return (set) => ({
-      session: null,
-      setSession: (session: AuthUser | null) => set({ session }),
+export class SessionStateService {
+  private readonly _session = signal<SessionState>(this.loadSession());
+
+  readonly session = computed(() => this._session());
+
+  constructor() {
+    effect(() => {
+      if (!isBrowser()) return;
+
+      const current = this._session();
+      if (current) {
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(current));
+      } else {
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+      }
     });
   }
 
-  override createStore() {
-    return createStore(
-      persist<SessionState>(this.initStore(), {
-        name: 'session-storage',
-        storage: createJSONStorage(() => sessionStorage),
-      })
-    );
+  setSession(user: AuthUser): void {
+    this._session.set({
+      session: user,
+    });
+  }
+
+  clearSession(): void {
+    this._session.set({
+      session: null,
+    });
+  }
+
+  private loadSession(): SessionState {
+    try {
+      const stored = localStorage.getItem(SESSION_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored) as SessionState;
+      }
+      return { session: null };
+    } catch {
+      return { session: null };
+    }
   }
 }

@@ -1,4 +1,4 @@
-<ng-container *ngIf="session$ | async as session; else ready">
+<ng-container *ngIf="sessionStore.session; else ready">
   <h1>Loading...</h1>
 </ng-container>
 <ng-template #ready>

@@ -11,7 +11,7 @@ import { ApiResponse } from '../../types/api.type';
   providedIn: 'root',
 })
 export class TaskService {
-  private sessionService = inject(SessionStateService);
+  private sessionStore = inject(SessionStateService);
 
   private defaultHeaders = new HttpHeaders({
     'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export class TaskService {
   constructor(private http: HttpClient) {}
 
   getHeaders(): HttpHeaders {
-    const { session } = this.sessionService.getState();
+    const { session } = this.sessionStore.session();
     if (!session) return this.defaultHeaders;
 
     return this.defaultHeaders.append(

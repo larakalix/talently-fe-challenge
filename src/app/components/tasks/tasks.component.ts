@@ -8,7 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 import { TaskService } from '../../services/tasks/task.service';
-import { SessionStateService } from '../../state/session-store';
+import { SessionState, SessionStateService } from '../../state/session-store';
 import { TaskStateService } from '../../state/tasks-store';
 import { TaskDialogComponent } from './task-dialog/task-dialog.component';
 import { HeaderComponent } from './header/header.component';
@@ -28,14 +28,12 @@ import { ConfirmDialogComponent } from '../../ui/confirm-dialog/confirm-dialog.c
 })
 export class TasksComponent implements OnInit {
   readonly dialog = inject(MatDialog);
+  public readonly sessionStore: SessionState =
+    inject(SessionStateService).session();
+  private readonly taskStore = inject(TaskStateService);
+  public readonly tasksState = this.taskStore.tasks();
 
-  private sessionStore = inject(SessionStateService);
-  private taskStore = inject(TaskStateService);
-
-  session$ = this.sessionStore.useStore((state) => state.session);
-  tasks$ = this.taskStore.useStore((state) => state.tasks);
-
-  loadingState: LoadingState = 'idle';
+  public loadingState: LoadingState = 'idle';
 
   constructor(private taskService: TaskService) {}
 
@@ -51,8 +49,7 @@ export class TasksComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
-          const { setTasks } = this.taskStore.getState();
-          setTasks(response.data);
+          this.taskStore.setTasks(response.data);
         },
         error: (err) => console.error('Error fetching tasks:', err),
       });
@@ -71,8 +68,7 @@ export class TasksComponent implements OnInit {
   deleteTask(id: Task['id']): void {
     this.taskService.deleteTask(id).subscribe({
       next: (response) => {
-        const { removeTask } = this.taskStore.getState();
-        removeTask(id);
+        this.taskStore.removeTask(response.data.id);
       },
       error: (error) => {
         console.error('Error deleting task:', error);

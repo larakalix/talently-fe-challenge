@@ -91,8 +91,7 @@ export class TaskDialogComponent {
   private createTask(task: Task): void {
     this.taskService.createTask(task).subscribe({
       next: (response) => {
-        const { addTask } = this.taskStore.getState();
-        addTask(response.data);
+        this.taskStore.addTask(response.data);
       },
       error: (error) => {
         console.error('Error creating task:', error);
@@ -103,8 +102,7 @@ export class TaskDialogComponent {
   private updateTask(task: Task): void {
     this.taskService.updateTask(task).subscribe({
       next: (response) => {
-        const { updateTask } = this.taskStore.getState();
-        updateTask(task);
+        this.taskStore.updateTask(response.data);
       },
       error: (error) => {
         console.error('Error updating task:', error);

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
-import { SessionStateService } from '../../state/session-store';
-import { CommonModule } from '@angular/common';
+import { SessionState, SessionStateService } from '../../state/session-store';
+import { AuthUser } from '../../types/auth.type';
 
 @Component({
   selector: 'app-auth-layout',
@@ -12,6 +13,8 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthLayoutComponent {
-  private sessionStore = inject(SessionStateService);
-  session$ = this.sessionStore.useStore((state) => state.session);
+  public readonly sessionStore: SessionState =
+    inject(SessionStateService).session();
+
+  constructor() {}
 }
