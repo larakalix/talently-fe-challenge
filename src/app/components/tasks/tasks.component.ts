@@ -96,4 +96,8 @@ export class TasksComponent implements OnInit {
       }
     });
   }
+
+  identify(index: number, task: Task): string {
+    return task.id;
+  }
 }

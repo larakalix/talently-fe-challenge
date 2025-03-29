@@ -1,1 +1,8 @@
-<router-outlet></router-outlet>
+<ng-container *ngIf="isBrowser; else loading">
+  <router-outlet></router-outlet>
+</ng-container>
+<ng-template #loading>
+  <div class="flex justify-center items-center min-h-screen">
+    <app-spinner />
+  </div>
+</ng-template>

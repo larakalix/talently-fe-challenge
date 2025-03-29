@@ -2,9 +2,9 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/tasks', pathMatch: 'full' },
+  { path: 'tasks', redirectTo: '', pathMatch: 'full' },
   {
-    path: 'tasks',
+    path: '',
     canActivate: [AuthGuard],
     data: { requiresAuth: true },
     loadComponent: () =>
